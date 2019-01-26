@@ -28,7 +28,7 @@ namespace BrutalHack.ggj19.Music
 
         private void Start()
         {
-            Score score = MusicXmlParser.GetScore("Assets/Music/Beat.xml");
+            Score score = MusicXmlParser.GetScore("Assets/Music/Gute_Laune/Beat.xml");
             audioSource = GetComponent<AudioSource>();
 //            ProcessPart(score.Parts[0]);
             ProcessMidiXml();
@@ -40,7 +40,7 @@ namespace BrutalHack.ggj19.Music
         private void ProcessMidiXml()
         {
             XmlDocument xmlDocument = new XmlDocument();
-            FileStream fileStream = new FileStream("Assets/Music/Beat-absolute.xml", FileMode.Open, FileAccess.Read);
+            FileStream fileStream = new FileStream("Assets/Music/Gute_Laune/Beat.xml", FileMode.Open, FileAccess.Read);
             xmlDocument.Load(fileStream);
             XmlNode firstTrack = xmlDocument.SelectSingleNode("//MIDIFile/Track");
             if (firstTrack != null)
