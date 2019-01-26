@@ -7,12 +7,12 @@ namespace BrutalHack.ggj19.General
     {
         public GameObject nodePrefab;
         public GameObject linePrefab;
+        public GraphGenerator graphGenerator;
 
-        private float manipulationPercentage = 0.2f;
-        private GraphGenerator graphGenerator;
-        private List<Node> nodes;
-        private Dictionary<Node, GameObject> nodesToGameObjects;
+        public Dictionary<Node, GameObject> nodesToGameObjects;
         private Dictionary<Vector2, GameObject> centerToLineRenderer;
+        private float manipulationPercentage = 0.2f;
+        private List<Node> nodes;
 
         private void Start()
         {
