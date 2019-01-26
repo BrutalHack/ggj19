@@ -1,4 +1,5 @@
-﻿﻿using System.Collections;
+﻿using System.Collections;
+using BrutalHack.ggj19.Music;
 using UnityEngine;
 using UnityEngine.Experimental.Input;
 
@@ -15,9 +16,32 @@ namespace BrutalHack.ggj19.General
         public bool moveWest = false;
         public bool moveEast = false;
 
+        public MusicController musicController;
+        private bool horizontalMovementEnabled;
+        private bool verticalMovementEnabled;
+
+        public float InputTimeout = 0.3f;
+
+        private float snareTimer;
+        private float bassTimer;
+
         void Start()
         {
             StartCoroutine(PlacePlayer());
+            musicController.OnBass += OnBass;
+            musicController.OnSnare += OnSnare;
+        }
+
+        private void OnSnare(TimedNote note)
+        {
+            snareTimer = InputTimeout;
+            verticalMovementEnabled = true;
+        }
+
+        private void OnBass(TimedNote note)
+        {
+            bassTimer = InputTimeout;
+            horizontalMovementEnabled = true;
         }
 
         IEnumerator PlacePlayer()
@@ -29,27 +53,38 @@ namespace BrutalHack.ggj19.General
 
         void Update()
         {
-            Keyboard keyboard = InputSystem.GetDevice<Keyboard>();
-            if (keyboard.wKey.wasPressedThisFrame || keyboard.upArrowKey.wasPressedThisFrame)
-            {
-                MoveNorth();
-            }
+            UpdateSnareTimer();
+            UpdateBassTimer();
+            UpdateInput();
+            UpdateMovement();
+        }
 
-            if (keyboard.sKey.wasPressedThisFrame || keyboard.downArrowKey.wasPressedThisFrame)
+        private void UpdateSnareTimer()
+        {
+            if (snareTimer > 0f)
             {
-                MoveSouth();
+                snareTimer -= Time.deltaTime;
             }
-
-            if (keyboard.aKey.wasPressedThisFrame || keyboard.leftArrowKey.wasPressedThisFrame)
+            else
             {
-                MoveWest();
+                verticalMovementEnabled = false;
             }
+        }
 
-            if (keyboard.dKey.wasPressedThisFrame || keyboard.rightArrowKey.wasPressedThisFrame)
+        private void UpdateBassTimer()
+        {
+            if (bassTimer > 0f)
             {
-                MoveEast();
+                bassTimer -= Time.deltaTime;
             }
+            else
+            {
+                horizontalMovementEnabled = false;
+            }
+        }
 
+        private void UpdateMovement()
+        {
             if (playerPosition == null)
             {
                 return;
@@ -100,6 +135,38 @@ namespace BrutalHack.ggj19.General
                 moved = false;
                 PlayerMarker.transform.position =
                     GameGraphGenerator.nodesToGameObjects[playerPosition].transform.position;
+                horizontalMovementEnabled = false;
+                verticalMovementEnabled = false;
+            }
+        }
+
+        private void UpdateInput()
+        {
+            Keyboard keyboard = InputSystem.GetDevice<Keyboard>();
+            if (verticalMovementEnabled)
+            {
+                if (keyboard.wKey.wasPressedThisFrame || keyboard.upArrowKey.wasPressedThisFrame)
+                {
+                    MoveNorth();
+                }
+
+                if (keyboard.sKey.wasPressedThisFrame || keyboard.downArrowKey.wasPressedThisFrame)
+                {
+                    MoveSouth();
+                }
+            }
+
+            if (horizontalMovementEnabled)
+            {
+                if (keyboard.aKey.wasPressedThisFrame || keyboard.leftArrowKey.wasPressedThisFrame)
+                {
+                    MoveWest();
+                }
+
+                if (keyboard.dKey.wasPressedThisFrame || keyboard.rightArrowKey.wasPressedThisFrame)
+                {
+                    MoveEast();
+                }
             }
         }
 
