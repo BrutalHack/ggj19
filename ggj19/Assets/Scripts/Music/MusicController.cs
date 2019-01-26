@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Xml;
 using MusicXml;
 using MusicXml.Domain;
 using UnityEngine;
@@ -18,7 +20,7 @@ namespace BrutalHack.ggj19.Music
         public event OnNote OnSnare;
         public event OnNote OnBass;
         public event OnNote OnRest;
-        
+
         public float eventOffsetInSeconds = -0.1f;
 
         public Queue<TimedNote> notes = new Queue<TimedNote>();
@@ -28,15 +30,41 @@ namespace BrutalHack.ggj19.Music
         {
             Score score = MusicXmlParser.GetScore("Assets/Music/Beat.xml");
             audioSource = GetComponent<AudioSource>();
-            ProcessPart(score.Parts[0]);
+//            ProcessPart(score.Parts[0]);
+            ProcessMidiXml();
             musicStartTimestamp = Time.time;
             audioSource.Play();
 //            OnSnare += note => Debug.Log("Snare");
         }
 
+        private void ProcessMidiXml()
+        {
+            XmlDocument xmlDocument = new XmlDocument();
+            FileStream fileStream = new FileStream("Assets/Music/Beat-absolute.xml", FileMode.Open, FileAccess.Read);
+            xmlDocument.Load(fileStream);
+            XmlNode firstTrack = xmlDocument.SelectSingleNode("//MIDIFile/Track");
+            if (firstTrack != null)
+            {
+                foreach (XmlElement eventNode in firstTrack)
+                {
+                    if (eventNode["NoteOn"] != null)
+                    {
+                        if (eventNode["Absolute"] != null)
+                        {
+                            //Timestamps in MIDI are milliseconds as Integer
+                            double timeStamp = double.Parse(eventNode["Absolute"].InnerText) / 1000;
+                            NoteType noteType =
+                                ProcessMidiNoteType(int.Parse(eventNode["NoteOn"].Attributes["Note"].InnerText));
+                            notes.Enqueue(new TimedNote {type = noteType, timestamp = timeStamp});
+                        }
+                    }
+                }
+            }
+        }
+
         private void Update()
         {
-            double relativeMusicTimestamp =  Time.time - musicStartTimestamp;
+            double relativeMusicTimestamp = Time.time - musicStartTimestamp;
             if (notes.Peek().timestamp < (relativeMusicTimestamp - eventOffsetInSeconds))
             {
                 TimedNote note = notes.Dequeue();
@@ -71,8 +99,8 @@ namespace BrutalHack.ggj19.Music
                         NoteType noteType = ProcessNoteType(note);
                         double noteDurationInSeconds = GetNoteDurationInSeconds(note.Duration, quarterNoteDivisions,
                             quarterNoteDurationInSeconds);
-                        
-                        notes.Enqueue(new TimedNote{type = noteType, timestamp = noteTimestamp});
+
+                        notes.Enqueue(new TimedNote {type = noteType, timestamp = noteTimestamp});
                         noteTimestamp += noteDurationInSeconds;
                     }
                 }
@@ -101,6 +129,25 @@ namespace BrutalHack.ggj19.Music
                         type = NoteType.Snare;
                         break;
                 }
+            }
+
+            return type;
+        }
+
+        private static NoteType ProcessMidiNoteType(int midiSignal)
+        {
+            NoteType type = NoteType.Rest;
+            if (midiSignal == 48)
+            {
+                type = NoteType.Bass;
+            }
+            else if (midiSignal == 50)
+            {
+                type = NoteType.Snare;
+            }
+            else
+            {
+                throw new InvalidOperationException("Midi signal " + midiSignal + " is not supported.");
             }
 
             return type;
