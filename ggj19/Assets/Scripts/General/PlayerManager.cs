@@ -2,6 +2,7 @@
 using BrutalHack.ggj19.Music;
 using UnityEngine;
 using UnityEngine.Experimental.Input;
+using UnityEngine.Serialization;
 
 namespace BrutalHack.ggj19.General
 {
@@ -20,10 +21,12 @@ namespace BrutalHack.ggj19.General
         private bool horizontalMovementEnabled;
         private bool verticalMovementEnabled;
 
-        public float InputTimeout = 0.3f;
+        public float inputTimeout = 0.3f;
 
         private float snareTimer;
         private float bassTimer;
+        private static readonly int ActivateVertical = Animator.StringToHash("activateVertical");
+        private static readonly int ActivateHorizontal = Animator.StringToHash("activateHorizontal");
 
         void Start()
         {
@@ -34,14 +37,35 @@ namespace BrutalHack.ggj19.General
 
         private void OnSnare(TimedNote note)
         {
-            snareTimer = InputTimeout;
+            snareTimer = inputTimeout;
             verticalMovementEnabled = true;
+            ActivateLine(DirectionEnum.North, ActivateVertical);
+            ActivateLine(DirectionEnum.South, ActivateVertical);
         }
 
         private void OnBass(TimedNote note)
         {
-            bassTimer = InputTimeout;
+            bassTimer = inputTimeout;
             horizontalMovementEnabled = true;
+            
+            ActivateLine(DirectionEnum.East, ActivateHorizontal);
+            ActivateLine(DirectionEnum.West, ActivateHorizontal);
+        }
+
+        private void ActivateLine(DirectionEnum direction, int trigger)
+        {
+            if (playerPosition?.Neighbours == null || !playerPosition.Neighbours.ContainsKey(direction))
+            {
+                return;
+            }
+
+            GameObject lineObject =
+                GameGraphGenerator.GetLineBetweenNodesIfExists(playerPosition,
+                    playerPosition.Neighbours[direction]);
+            if (lineObject != null)
+            {
+                lineObject.GetComponent<Animator>().SetTrigger(trigger);
+            }
         }
 
         IEnumerator PlacePlayer()

@@ -25,6 +25,10 @@ namespace BrutalHack.ggj19.Music
 
         public Queue<TimedNote> notes = new Queue<TimedNote>();
         private float musicStartTimestamp;
+        private bool musicIsPlaying;
+
+        public bool autoplay;
+        public float autoplayDelay = 3f;
 
         private void Start()
         {
@@ -32,20 +36,40 @@ namespace BrutalHack.ggj19.Music
 //            ProcessPart(score.Parts[0]);
             audioSource = GetComponent<AudioSource>();
             ProcessMidiXml();
-            StartCoroutine(WaitAndPlayMusic());
+            if (autoplay)
+            {
+                StartCoroutine(WaitAndPlayMusic());
+            }
+
 //            OnSnare += note => Debug.Log("Snare");
         }
 
         private IEnumerator WaitAndPlayMusic()
         {
-            yield return new WaitForSeconds(2f);
+            yield return new WaitForSeconds(autoplayDelay);
 //            audioSource.time = 0f;
+            PlayMusic();
+        }
+
+        public void PlayMusic()
+        {
             musicStartTimestamp = Time.time;
             audioSource.Play();
+            musicIsPlaying = true;
         }
 
         private void Update()
         {
+            UpdateNotes();
+        }
+
+        private void UpdateNotes()
+        {
+            if (!musicIsPlaying)
+            {
+                return;
+            }
+
             double relativeMusicTimestamp = Time.time - musicStartTimestamp;
             if (notes.Count > 0)
             {

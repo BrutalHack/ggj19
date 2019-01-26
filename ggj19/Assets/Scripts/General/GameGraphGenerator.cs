@@ -10,7 +10,7 @@ namespace BrutalHack.ggj19.General
         public GraphGenerator graphGenerator;
 
         public Dictionary<Node, GameObject> nodesToGameObjects;
-        private Dictionary<Vector2, GameObject> centerToLineRenderer;
+        public Dictionary<Vector2, GameObject> centerToLineRenderer;
         private float manipulationPercentage = 0.2f;
         private List<Node> nodes;
 
@@ -52,6 +52,17 @@ namespace BrutalHack.ggj19.General
         private Vector2 CalculateLineCenter(Node node, Node neighbour)
         {
             return (node.Coordinate + neighbour.Coordinate) / 2;
+        }
+
+        public GameObject GetLineBetweenNodesIfExists(Node node, Node otherNode)
+        {
+            Vector2 lineCenter = CalculateLineCenter(node, otherNode);
+            if (centerToLineRenderer.ContainsKey(lineCenter))
+            {
+                return centerToLineRenderer[lineCenter];
+            }
+
+            return null;
         }
 
         private Vector3 CreatePosition(Node node)
