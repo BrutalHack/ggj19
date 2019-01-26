@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using UnityEngine;
-using UnityEngine.Experimental.Input;
 
 namespace BrutalHack.ggj19.General
 {
@@ -15,6 +14,7 @@ namespace BrutalHack.ggj19.General
         public bool moveWest = false;
         public bool moveEast = false;
 
+        // Start is called before the first frame update
         void Start()
         {
             StartCoroutine(PlacePlayer());
@@ -27,29 +27,9 @@ namespace BrutalHack.ggj19.General
             moved = true;
         }
 
+        // Update is called once per frame
         void Update()
         {
-            Keyboard keyboard = InputSystem.GetDevice<Keyboard>();
-            if (keyboard.wKey.wasPressedThisFrame || keyboard.upArrowKey.wasPressedThisFrame)
-            {
-                MoveNorth();
-            }
-
-            if (keyboard.sKey.wasPressedThisFrame || keyboard.downArrowKey.wasPressedThisFrame)
-            {
-                MoveSouth();
-            }
-
-            if (keyboard.aKey.wasPressedThisFrame || keyboard.leftArrowKey.wasPressedThisFrame)
-            {
-                MoveWest();
-            }
-
-            if (keyboard.dKey.wasPressedThisFrame || keyboard.rightArrowKey.wasPressedThisFrame)
-            {
-                MoveEast();
-            }
-
             if (playerPosition == null)
             {
                 return;
@@ -103,22 +83,22 @@ namespace BrutalHack.ggj19.General
             }
         }
 
-        private void MoveNorth()
+        public void MoveNorth()
         {
             moveNorth = true;
         }
 
-        private void MoveSouth()
+        public void MoveSouth()
         {
             moveSouth = true;
         }
 
-        private void MoveWest()
+        public void MoveWest()
         {
             moveWest = true;
         }
 
-        private void MoveEast()
+        public void MoveEast()
         {
             moveEast = true;
         }
