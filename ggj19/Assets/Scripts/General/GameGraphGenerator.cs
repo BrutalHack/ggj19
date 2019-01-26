@@ -42,8 +42,10 @@ namespace BrutalHack.ggj19.General
                 {
                     GameObject line = Instantiate(linePrefab, transform);
                     LineRenderer lineRenderer = line.GetComponent<LineRenderer>();
-                    lineRenderer.SetPosition(0, nodesToGameObjects[node].transform.position);
-                    lineRenderer.SetPosition(1, nodesToGameObjects[neighbour.Value].transform.position);
+                    lineRenderer.SetPosition(0,
+                        nodesToGameObjects[node].transform.position + new Vector3(0f, 0f, 0.1f));
+                    lineRenderer.SetPosition(1,
+                        nodesToGameObjects[neighbour.Value].transform.position + new Vector3(0f, 0f, 0.1f));
                     centerToLineRenderer.Add(center, line);
                 }
             }

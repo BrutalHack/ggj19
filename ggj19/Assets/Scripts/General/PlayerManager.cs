@@ -27,6 +27,7 @@ namespace BrutalHack.ggj19.General
         private float bassTimer;
         private static readonly int ActivateVertical = Animator.StringToHash("activateVertical");
         private static readonly int ActivateHorizontal = Animator.StringToHash("activateHorizontal");
+        private static readonly int Jump = Animator.StringToHash("jump");
 
         void Start()
         {
@@ -159,6 +160,7 @@ namespace BrutalHack.ggj19.General
                 moved = false;
                 PlayerMarker.transform.position =
                     GameGraphGenerator.nodesToGameObjects[playerPosition].transform.position;
+                GameGraphGenerator.nodesToGameObjects[playerPosition].GetComponent<Animator>().SetTrigger(Jump);
                 horizontalMovementEnabled = false;
                 verticalMovementEnabled = false;
             }
