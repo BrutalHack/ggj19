@@ -28,9 +28,9 @@ namespace BrutalHack.ggj19.Music
 
         private void Start()
         {
-            Score score = MusicXmlParser.GetScore("Assets/Music/Gute_Laune/Beat.xml");
-            audioSource = GetComponent<AudioSource>();
+//            Score score = MusicXmlParser.GetScore("Assets/Music/Gute_Laune/Beat.xml");
 //            ProcessPart(score.Parts[0]);
+            audioSource = GetComponent<AudioSource>();
             ProcessMidiXml();
             StartCoroutine(WaitAndPlayMusic());
 //            OnSnare += note => Debug.Log("Snare");
@@ -39,9 +39,23 @@ namespace BrutalHack.ggj19.Music
         private IEnumerator WaitAndPlayMusic()
         {
             yield return new WaitForSeconds(2f);
-            musicStartTimestamp = Time.time - 115f;
-            audioSource.time = 115f;
+//            audioSource.time = 0f;
+            musicStartTimestamp = Time.time;
             audioSource.Play();
+        }
+
+        private void Update()
+        {
+            double relativeMusicTimestamp = Time.time - musicStartTimestamp;
+            if (notes.Count > 0)
+            {
+                double noteTimestamp = notes.Peek().timestamp + eventOffsetInSeconds;
+                if (noteTimestamp < relativeMusicTimestamp)
+                {
+                    TimedNote note = notes.Dequeue();
+                    FireNoteEvent(note);
+                }
+            }
         }
 
         private void ProcessMidiXml()
@@ -75,20 +89,6 @@ namespace BrutalHack.ggj19.Music
                             notes.Enqueue(new TimedNote {type = noteType, timestamp = timeStamp});
                         }
                     }
-                }
-            }
-        }
-
-        private void Update()
-        {
-            double relativeMusicTimestamp = Time.time - musicStartTimestamp;
-            if (notes.Count > 0)
-            {
-                double noteTimestamp = notes.Peek().timestamp + eventOffsetInSeconds;
-                if (noteTimestamp < relativeMusicTimestamp)
-                {
-                    TimedNote note = notes.Dequeue();
-                    FireNoteEvent(note);
                 }
             }
         }
