@@ -782,6 +782,12 @@ PrefabInstance:
       propertyPath: m_Name
       value: GameGraphGenerator
       objectReference: {fileID: 0}
+    - target: {fileID: 6038126725856040188, guid: 3d3244e6edb4ff540bfda3ac6242069f,
+        type: 3}
+      propertyPath: nodePrefab
+      value: 
+      objectReference: {fileID: 5283786743636030417, guid: 39ab20e5107621b46b0fd39ed7bbf393,
+        type: 3}
     - target: {fileID: 6038126725856040189, guid: 3d3244e6edb4ff540bfda3ac6242069f,
         type: 3}
       propertyPath: m_LocalPosition.x
