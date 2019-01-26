@@ -10,13 +10,6 @@ namespace BrutalHack.ggj19
             Animator animator = GetComponent<Animator>();
             AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
             animator.Play(stateInfo.fullPathHash, 0, Random.Range(0f,1f));
-            foreach (AnimationState state in GetComponent<Animation>())
-            {
-                if (state.name == "Human_Idle")
-                {
-                    state.time = Random.value * state.clip.length;
-                }
-            }
         }
 
         // Update is called once per frame
