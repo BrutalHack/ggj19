@@ -1,4 +1,4 @@
-﻿namespace BrutalHack.ggj19
+﻿namespace BrutalHack.ggj19.General
 {
     public enum DirectionEnum
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace BrutalHack.ggj19
+namespace BrutalHack.ggj19.General
 {
     public class GraphGenerator
     {
@@ -10,7 +10,7 @@ namespace BrutalHack.ggj19
         public float midRadius = 30f;
         public float innerRadius = 15f;
         public float nodeDistance = 3f;
-        public Dictionary<Vector2Int, Node> nodes;
+        public Dictionary<Vector2, Node> nodes;
         private List<DirectionEnum> directions;
 
         public void GenerateGraph()
@@ -18,7 +18,6 @@ namespace BrutalHack.ggj19
             GenerateDirections();
             GenerateNodes();
             ConnectNodes();
-            Debug.Log("GraphGenerated.");
         }
 
         private void GenerateDirections()
@@ -31,13 +30,13 @@ namespace BrutalHack.ggj19
 
         private void GenerateNodes()
         {
-            nodes = new Dictionary<Vector2Int, Node>();
+            nodes = new Dictionary<Vector2, Node>();
             int radiusSteps = Mathf.FloorToInt(worldRadius / nodeDistance);
             for (int i = -radiusSteps; i <= radiusSteps; i++)
             {
                 for (int j = -radiusSteps; j <= radiusSteps; j++)
                 {
-                    Vector2Int coordinate = new Vector2Int(i, j);
+                    Vector2 coordinate = new Vector2(i * nodeDistance, j * nodeDistance);
                     if (PointInRadius(coordinate, innerRadius))
                     {
                         CreateAndAddPoint(coordinate, CircleEnum.InnerCircle);
@@ -54,7 +53,7 @@ namespace BrutalHack.ggj19
             }
         }
 
-        private void CreateAndAddPoint(Vector2Int coordinate, CircleEnum circle)
+        private void CreateAndAddPoint(Vector2 coordinate, CircleEnum circle)
         {
             nodes.Add(coordinate, new Node
             {
@@ -86,25 +85,25 @@ namespace BrutalHack.ggj19
 
         private Node GetNeighbour(Node node, DirectionEnum direction)
         {
-            Vector2Int directionValue;
+            Vector2 directionValue;
             switch (direction)
             {
                 case DirectionEnum.North:
-                    directionValue = new Vector2Int(0, 1);
+                    directionValue = new Vector2(0, 1 * nodeDistance);
                     break;
                 case DirectionEnum.South:
-                    directionValue = new Vector2Int(0, -1);
+                    directionValue = new Vector2(0, -1 * nodeDistance);
                     break;
                 case DirectionEnum.West:
-                    directionValue = new Vector2Int(-1, 0);
+                    directionValue = new Vector2(-1 * nodeDistance, 0);
                     break;
                 case DirectionEnum.East:
-                    directionValue = new Vector2Int(1, 0);
+                    directionValue = new Vector2(1 * nodeDistance, 0);
                     break;
                 default: throw new InvalidOperationException("Unknown ENUM Value: " + direction);
             }
 
-            Vector2Int neighbourCoordinate = node.Coordinate + directionValue;
+            Vector2 neighbourCoordinate = node.Coordinate + directionValue;
             if (nodes.ContainsKey(neighbourCoordinate))
             {
                 return nodes[neighbourCoordinate];

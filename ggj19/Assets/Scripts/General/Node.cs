@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace BrutalHack.ggj19
+namespace BrutalHack.ggj19.General
 {
     public class Node
     {
-        public Vector2Int Coordinate;
+        public Vector2 Coordinate;
         public CircleEnum Circle;
         public Dictionary<DirectionEnum, Node> Neighbours = new Dictionary<DirectionEnum, Node>();
 

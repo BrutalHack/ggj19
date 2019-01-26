@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace BrutalHack.ggj19
+namespace BrutalHack.ggj19.General
 {
     public class GameGraphGenerator : MonoBehaviour
     {
@@ -12,7 +12,7 @@ namespace BrutalHack.ggj19
         private GraphGenerator graphGenerator;
         private List<Node> nodes;
         private Dictionary<Node, GameObject> nodesToGameObjects;
-        private Dictionary<Vector2Int, GameObject> centerToLineRenderer;
+        private Dictionary<Vector2, GameObject> centerToLineRenderer;
 
         private void Start()
         {
@@ -21,25 +21,26 @@ namespace BrutalHack.ggj19
             nodes = new List<Node>(graphGenerator.nodes.Values);
 
             nodesToGameObjects = new Dictionary<Node, GameObject>();
-            centerToLineRenderer = new Dictionary<Vector2Int, GameObject>();
+            centerToLineRenderer = new Dictionary<Vector2, GameObject>();
             foreach (var node in nodes)
             {
                 nodesToGameObjects.Add(node, CreateGameObject(node));
+            }
+
+            foreach (var node in nodes)
+            {
                 CreateLines(node);
             }
         }
 
         private void CreateLines(Node node)
         {
-            Debug.Log("Node count: " + node.Neighbours.Count);
             foreach (var neighbour in node.Neighbours)
             {
-                Debug.Log("Neighbour.");
-                Vector2Int center = CalculateLineCenter(node, neighbour.Value);
+                Vector2 center = CalculateLineCenter(node, neighbour.Value);
                 if (!centerToLineRenderer.ContainsKey(center))
                 {
-                    Debug.Log("Create Line");
-                    GameObject line = Instantiate(linePrefab);
+                    GameObject line = Instantiate(linePrefab, transform);
                     LineRenderer lineRenderer = line.GetComponent<LineRenderer>();
                     lineRenderer.SetPosition(0, nodesToGameObjects[node].transform.position);
                     lineRenderer.SetPosition(1, nodesToGameObjects[neighbour.Value].transform.position);
@@ -48,16 +49,9 @@ namespace BrutalHack.ggj19
             }
         }
 
-        private Vector2Int CalculateLineCenter(Node node, Node neighbour)
+        private Vector2 CalculateLineCenter(Node node, Node neighbour)
         {
-            Vector3 position = (ConvertNodePositionToWorldPosition(node) + ConvertNodePositionToWorldPosition(neighbour)) / 2;
-            return new Vector2Int(Mathf.FloorToInt(position.x), Mathf.FloorToInt(position.y));
-        }
-
-        private Vector3 ConvertNodePositionToWorldPosition(Node node)
-        {
-            return new Vector3(node.Coordinate.x * graphGenerator.nodeDistance, 
-                node.Coordinate.y * graphGenerator.nodeDistance, 0);
+            return (node.Coordinate + neighbour.Coordinate) / 2;
         }
 
         private Vector3 CreatePosition(Node node)
