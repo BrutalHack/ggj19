@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace BrutalHack.ggj19
+﻿namespace BrutalHack.ggj19
 {
     public enum DirectionEnum
     {
