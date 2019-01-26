@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace BrutalHack.ggj19.General
 {
@@ -12,12 +14,47 @@ namespace BrutalHack.ggj19.General
         public float nodeDistance = 3f;
         public Dictionary<Vector2, Node> nodes;
         private List<DirectionEnum> directions;
+        private int radiusSteps;
+        private float manipulationPercentage = 0.1f;
 
         public void GenerateGraph()
         {
+            radiusSteps = Mathf.FloorToInt(worldRadius / nodeDistance);
             GenerateDirections();
             GenerateNodes();
             ConnectNodes();
+            RemoveRandomNodes();
+        }
+
+        private void RemoveRandomNodes()
+        {
+            int removeCount = Mathf.FloorToInt(nodes.Count * manipulationPercentage);
+            for (int i = 0; i < removeCount; i++)
+            {
+                int removeAtX = Random.Range(-radiusSteps, radiusSteps);
+                int removeAtY = Random.Range(-radiusSteps, radiusSteps);
+                Vector2 toRemove = new Vector2(removeAtX * nodeDistance, removeAtY * nodeDistance);
+                if (nodes.ContainsKey(toRemove) && nodes[toRemove].Neighbours.Count > 1)
+                {
+                    RemoveNode(nodes[toRemove]);
+                }
+            }
+        }
+
+        private void RemoveNode(Node node)
+        {
+            foreach (var neighbourPair in node.Neighbours.ToList())
+            {
+                foreach (var neighbourNeighbourPair in neighbourPair.Value.Neighbours.ToList())
+                {
+                    if (neighbourNeighbourPair.Value.Equals(node))
+                    {
+                        neighbourPair.Value.Neighbours.Remove(neighbourNeighbourPair.Key);
+                    }
+                }
+            }
+
+            nodes.Remove(node.Coordinate);
         }
 
         private void GenerateDirections()
@@ -31,7 +68,6 @@ namespace BrutalHack.ggj19.General
         private void GenerateNodes()
         {
             nodes = new Dictionary<Vector2, Node>();
-            int radiusSteps = Mathf.FloorToInt(worldRadius / nodeDistance);
             for (int i = -radiusSteps; i <= radiusSteps; i++)
             {
                 for (int j = -radiusSteps; j <= radiusSteps; j++)
