@@ -32,17 +32,32 @@ namespace BrutalHack.ggj19.Music
             audioSource = GetComponent<AudioSource>();
 //            ProcessPart(score.Parts[0]);
             ProcessMidiXml();
-            musicStartTimestamp = Time.time;
-            audioSource.Play();
+            StartCoroutine(WaitAndPlayMusic());
 //            OnSnare += note => Debug.Log("Snare");
+        }
+
+        private IEnumerator WaitAndPlayMusic()
+        {
+            yield return new WaitForSeconds(2f);
+            musicStartTimestamp = Time.time - 115f;
+            audioSource.time = 115f;
+            audioSource.Play();
         }
 
         private void ProcessMidiXml()
         {
             XmlDocument xmlDocument = new XmlDocument();
-            FileStream fileStream = new FileStream("Assets/Music/Gute_Laune/Beat.xml", FileMode.Open, FileAccess.Read);
+            FileStream fileStream =
+                new FileStream("Assets/Music/Gute_Laune/Beat-midi.xml", FileMode.Open, FileAccess.Read);
             xmlDocument.Load(fileStream);
+            XmlNode ticksPerBeatElement = xmlDocument.SelectSingleNode("//MIDIFile/TicksPerBeat");
+            int ticksPerBeat = int.Parse(ticksPerBeatElement.InnerText);
+            Debug.Log("ticks per Beat: " + ticksPerBeat);
             XmlNode firstTrack = xmlDocument.SelectSingleNode("//MIDIFile/Track");
+
+            // the duration of a quarter note in seconds
+            double quarterNoteDurationInSeconds = 60d / tempo;
+
             if (firstTrack != null)
             {
                 foreach (XmlElement eventNode in firstTrack)
@@ -52,7 +67,9 @@ namespace BrutalHack.ggj19.Music
                         if (eventNode["Absolute"] != null)
                         {
                             //Timestamps in MIDI are milliseconds as Integer
-                            double timeStamp = double.Parse(eventNode["Absolute"].InnerText) / 1000;
+                            int durationInTicks = int.Parse(eventNode["Absolute"].InnerText);
+                            double timeStamp = GetNoteDurationInSeconds(durationInTicks, ticksPerBeat,
+                                quarterNoteDurationInSeconds);
                             NoteType noteType =
                                 ProcessMidiNoteType(int.Parse(eventNode["NoteOn"].Attributes["Note"].InnerText));
                             notes.Enqueue(new TimedNote {type = noteType, timestamp = timeStamp});
@@ -65,10 +82,14 @@ namespace BrutalHack.ggj19.Music
         private void Update()
         {
             double relativeMusicTimestamp = Time.time - musicStartTimestamp;
-            if (notes.Peek().timestamp < (relativeMusicTimestamp - eventOffsetInSeconds))
+            if (notes.Count > 0)
             {
-                TimedNote note = notes.Dequeue();
-                FireNoteEvent(note);
+                double noteTimestamp = notes.Peek().timestamp + eventOffsetInSeconds;
+                if (noteTimestamp < relativeMusicTimestamp)
+                {
+                    TimedNote note = notes.Dequeue();
+                    FireNoteEvent(note);
+                }
             }
         }
 
@@ -112,6 +133,13 @@ namespace BrutalHack.ggj19.Music
         {
             double quarterNotePercent = (double) noteDurationInDivisions / quarterNoteDivisions;
 //            Debug.Log("Percent of a quarter: " + quarterNotePercent * 100 + "%");
+            return quarterNotePercent * quarterNoteDurationInSeconds;
+        }
+
+        private static double GetNoteTimestamp(int noteTimeStampInDivisions, int quarterNoteDivisions,
+            double quarterNoteDurationInSeconds)
+        {
+            double quarterNotePercent = (double) noteTimeStampInDivisions / quarterNoteDivisions;
             return quarterNotePercent * quarterNoteDurationInSeconds;
         }
 
