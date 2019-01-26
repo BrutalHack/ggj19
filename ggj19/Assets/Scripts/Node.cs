@@ -5,7 +5,7 @@ namespace BrutalHack.ggj19
 {
     public class Node
     {
-        public Vector2 Coordinate;
+        public Vector2Int Coordinate;
         public CircleEnum Circle;
         public Dictionary<DirectionEnum, Node> Neighbours = new Dictionary<DirectionEnum, Node>();
 
