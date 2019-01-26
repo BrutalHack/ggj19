@@ -364,9 +364,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_LookaheadTime: 0
   m_LookaheadSmoothing: 10
-  m_LookaheadIgnoreY: 0
-  m_XDamping: 1
-  m_YDamping: 1
+  m_LookaheadIgnoreY: 1
+  m_XDamping: 2
+  m_YDamping: 2
   m_ZDamping: 1
   m_ScreenX: 0.5
   m_ScreenY: 0.5
@@ -374,8 +374,8 @@ MonoBehaviour:
   m_DeadZoneWidth: 0
   m_DeadZoneHeight: 0
   m_DeadZoneDepth: 0
-  m_UnlimitedSoftZone: 0
-  m_SoftZoneWidth: 0.8
+  m_UnlimitedSoftZone: 1
+  m_SoftZoneWidth: 0.7936299
   m_SoftZoneHeight: 0.8
   m_BiasX: 0
   m_BiasY: 0
