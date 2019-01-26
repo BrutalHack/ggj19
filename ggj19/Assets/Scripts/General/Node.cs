@@ -9,14 +9,15 @@ namespace BrutalHack.ggj19.General
         public CircleEnum Circle;
         public Dictionary<DirectionEnum, Node> Neighbours = new Dictionary<DirectionEnum, Node>();
 
-        // Start is called before the first frame update
-        void Start()
+        public List<Node> GetNeighbours()
         {
-        }
+            List<Node> nodes = new List<Node>();
+            foreach (var neighbourPair in Neighbours)
+            {
+                nodes.Add(neighbourPair.Value);
+            }
 
-        // Update is called once per frame
-        void Update()
-        {
+            return nodes;
         }
     }
 }
