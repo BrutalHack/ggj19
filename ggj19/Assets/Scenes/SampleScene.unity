@@ -625,6 +625,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3116883286985319981, guid: 2f3101020f70f44bfa662d9dc6c007ee,
+        type: 3}
+      propertyPath: autoplay
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2f3101020f70f44bfa662d9dc6c007ee, type: 3}
 --- !u!114 &1578839139 stripped
@@ -755,7 +760,7 @@ MonoBehaviour:
   moveWest: 0
   moveEast: 0
   musicController: {fileID: 1578839139}
-  InputTimeout: 0.3
+  inputTimeout: 0.3
 --- !u!4 &2074775066
 Transform:
   m_ObjectHideFlags: 0
