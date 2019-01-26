@@ -69,7 +69,19 @@ namespace BrutalHack.ggj19.General
 
         private GameObject CreateGameObject(Node node)
         {
-            return Instantiate(nodePrefab, CreatePosition(node), Quaternion.identity, transform);
+            GameObject nodeGameObject = Instantiate(nodePrefab, CreatePosition(node), Quaternion.identity, transform);
+            SpriteRenderer spriteRenderer = nodeGameObject.GetComponent<SpriteRenderer>();
+            if (node.Circle.Equals(CircleEnum.InnerCircle))
+            {
+                spriteRenderer.color = Color.yellow;
+            } else if (node.Circle.Equals(CircleEnum.MidCircle))
+            {
+                spriteRenderer.color = Color.cyan;
+            }else if (node.Circle.Equals(CircleEnum.OuterCircle))
+            {
+                spriteRenderer.color = Color.magenta;
+            }
+            return nodeGameObject;
         }
     }
 }

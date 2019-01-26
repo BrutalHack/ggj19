@@ -312,6 +312,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GameGraphGenerator: {fileID: 892899991}
   PlayerMarker: {fileID: 784612566}
+  moved: 0
+  moveNorth: 0
+  moveSouth: 0
+  moveWest: 0
+  moveEast: 0
+  Input:
+    m_Asset: {fileID: 11400000, guid: c0214b5230ddfd447a10c24279d25783, type: 3}
 --- !u!4 &2074775066
 Transform:
   m_ObjectHideFlags: 0

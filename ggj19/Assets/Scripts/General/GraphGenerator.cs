@@ -34,6 +34,10 @@ namespace BrutalHack.ggj19.General
                 int removeAtX = Random.Range(-radiusSteps, radiusSteps);
                 int removeAtY = Random.Range(-radiusSteps, radiusSteps);
                 Vector2 toRemove = new Vector2(removeAtX * nodeDistance, removeAtY * nodeDistance);
+                if (toRemove.Equals(Vector2.zero))
+                {
+                    continue;
+                }
                 if (nodes.ContainsKey(toRemove) && nodes[toRemove].Neighbours.Count > 1)
                 {
                     RemoveNode(nodes[toRemove]);
