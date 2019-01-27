@@ -801,6 +801,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   musicController: {fileID: 1578839139}
   playerManager: {fileID: 2074775065}
+  outroClip: {fileID: 8300000, guid: 2a92872ca836948d0a03805a53f4194e, type: 3}
 --- !u!114 &974976943
 MonoBehaviour:
   m_ObjectHideFlags: 0
