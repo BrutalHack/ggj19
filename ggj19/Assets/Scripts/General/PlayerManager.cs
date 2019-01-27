@@ -201,6 +201,12 @@ namespace BrutalHack.ggj19.General
 
         private void UpdateInput()
         {
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Keypad6))
+            {
+                Debug.Log("Application Quit");
+                Application.Quit();
+            }
+            
             float horizontal1 = Input.GetAxis("Horizontal 1");
             float horizontal2 = Input.GetAxis("Horizontal 2");
             float vertical1 = Input.GetAxis("Vertical 1");
