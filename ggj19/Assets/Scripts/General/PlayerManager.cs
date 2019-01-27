@@ -36,6 +36,8 @@ namespace BrutalHack.ggj19.General
         private AudioSource audioSource;
 
         private NodeCollectionLogic nodeCollectionLogic;
+        
+        public event MusicController.OnTime OnEndGame;
 
         float oldHorizontal1;
         float oldHorizontal2;
@@ -60,6 +62,7 @@ namespace BrutalHack.ggj19.General
 
         private void ShowScoreScene()
         {
+            OnEndGame?.Invoke();
             SceneManager.LoadScene((int) Scenes.ScoreScreen, LoadSceneMode.Additive);
         }
 

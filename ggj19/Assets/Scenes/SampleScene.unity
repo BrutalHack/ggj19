@@ -800,6 +800,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   musicController: {fileID: 1578839139}
+  playerManager: {fileID: 2074775065}
 --- !u!114 &974976943
 MonoBehaviour:
   m_ObjectHideFlags: 0

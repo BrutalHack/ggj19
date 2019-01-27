@@ -1,4 +1,5 @@
-﻿using BrutalHack.ggj19.General.Music;
+﻿using BrutalHack.ggj19.General;
+using BrutalHack.ggj19.General.Music;
 using UnityEngine;
 
 namespace BrutalHack.ggj19
@@ -6,6 +7,7 @@ namespace BrutalHack.ggj19
     public class CameraEndgameTrigger : MonoBehaviour
     {
         public MusicController musicController;
+        public PlayerManager playerManager;
 
         private static readonly int End = Animator.StringToHash("end");
 
@@ -13,6 +15,7 @@ namespace BrutalHack.ggj19
         void Start()
         {
             musicController.OnSongFinished += () => GetComponent<Animator>().SetTrigger(End);
+            playerManager.OnEndGame += () => GetComponent<Animator>().SetTrigger(End);
         }
     }
 }
