@@ -1,12 +1,26 @@
 using System.Collections.Generic;
 using System.Linq;
-using Sirenix.Utilities;
 using UnityEngine;
 
 namespace BrutalHack.ggj19.General
 {
     public class NodeCollectionLogic
     {
+        private static NodeCollectionLogic _instance;
+
+        public static NodeCollectionLogic Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new NodeCollectionLogic();
+                }
+
+                return _instance;
+            }
+        }
+
         public ISet<Node> passedNodes = new HashSet<Node>();
         public ISet<Node> deadNodes = new HashSet<Node>();
         public ISet<Vector2> passedConnections = new HashSet<Vector2>();
@@ -68,7 +82,7 @@ namespace BrutalHack.ggj19.General
         {
             List<Path> oldPaths = GenerateStartPaths(startNode);
 
-            while (!oldPaths.IsNullOrEmpty())
+            while (oldPaths != null && oldPaths.Count > 0)
             {
                 List<Path> newPaths = new List<Path>();
                 foreach (var path in oldPaths.ToArray())
@@ -186,7 +200,7 @@ namespace BrutalHack.ggj19.General
             return passedConnections.Contains(connection);
         }
 
-        private bool IsDeadNode(Node node)
+        public bool IsDeadNode(Node node)
         {
             if (deadNodes.Contains(node))
             {
@@ -200,6 +214,7 @@ namespace BrutalHack.ggj19.General
                 {
                     return false;
                 }
+
                 //LookupResult.Good => sector dead, check the next sector.
             }
 
@@ -208,7 +223,7 @@ namespace BrutalHack.ggj19.General
 
         private LookupResult LeftLookUpComplete(Node startNode, Node node, DirectionEnum direction)
         {
-            DirectionEnum reverseDirection = direction.Reverse(); 
+            DirectionEnum reverseDirection = direction.Reverse();
             DirectionEnum currentDirection = reverseDirection;
             for (int i = 0; i < 4; i++)
             {

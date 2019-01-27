@@ -1,10 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using BrutalHack.ggj19.General.Music;
-using BrutalHack.ggj19.Music;
+using Sirenix.Utilities;
 using UnityEngine;
 using UnityEngine.Experimental.Input;
-using UnityEngine.Serialization;
 using static BrutalHack.ggj19.General.DirectionEnum;
 
 namespace BrutalHack.ggj19.General
@@ -14,6 +14,7 @@ namespace BrutalHack.ggj19.General
         public GameGraphGenerator GameGraphGenerator;
         public GameObject PlayerMarker;
         public Node playerPosition;
+        private Node desiredPlayerPosition;
         public bool moved = false;
         public bool moveNorth = false;
         public bool moveSouth = false;
@@ -25,18 +26,19 @@ namespace BrutalHack.ggj19.General
         private bool verticalMovementEnabled;
 
         public float inputTimeout = 0.3f;
-        public FillCycleClass fillCycleClass;
-        public bool fillCycle;
-        public NodeCollectionLogic nodeCollector;
 
         private float snareTimer;
         private float bassTimer;
         private static readonly int ActivateVertical = Animator.StringToHash("activateVertical");
         private static readonly int ActivateHorizontal = Animator.StringToHash("activateHorizontal");
         private static readonly int Jump = Animator.StringToHash("jump");
+        private NodeCollectionLogic nodeCollectionLogic;
+        
+        public GameObject polygonColliderPrefab;
 
         void Start()
         {
+            nodeCollectionLogic = NodeCollectionLogic.Instance;
             StartCoroutine(PlacePlayer());
             musicController.OnBass += OnBass;
             musicController.OnSnare += OnSnare;
@@ -79,6 +81,7 @@ namespace BrutalHack.ggj19.General
         {
             yield return new WaitForSeconds(0.5f);
             playerPosition = GameGraphGenerator.graphGenerator.nodes[Vector2.zero];
+            desiredPlayerPosition = GameGraphGenerator.graphGenerator.nodes[Vector2.zero];
             moved = true;
         }
 
@@ -121,28 +124,12 @@ namespace BrutalHack.ggj19.General
                 return;
             }
 
-            if (fillCycle)
-            {
-                fillCycleClass.FillCycle(new List<Node>
-                {
-                    playerPosition.Neighbours[East],
-                    playerPosition.Neighbours[East].Neighbours[East],
-                    playerPosition.Neighbours[East].Neighbours[East].Neighbours[North],
-                    playerPosition.Neighbours[East].Neighbours[East].Neighbours[North].Neighbours[West],
-                    playerPosition.Neighbours[East].Neighbours[East].Neighbours[North].Neighbours[West].Neighbours[North],
-                    playerPosition.Neighbours[East].Neighbours[East].Neighbours[North].Neighbours[West].Neighbours[North].Neighbours[West],
-                    playerPosition.Neighbours[East].Neighbours[East].Neighbours[North].Neighbours[West].Neighbours[North].Neighbours[West].Neighbours[South],
-                    playerPosition.Neighbours[East].Neighbours[East].Neighbours[North].Neighbours[West].Neighbours[North].Neighbours[West].Neighbours[South].Neighbours[South]
-                });
-                fillCycle = false;
-            }
-
             if (moveNorth)
             {
                 moveNorth = false;
                 if (playerPosition.Neighbours.ContainsKey(North))
                 {
-                    playerPosition = playerPosition.Neighbours[North];
+                    desiredPlayerPosition = playerPosition.Neighbours[North];
                     moved = true;
                 }
             }
@@ -152,7 +139,7 @@ namespace BrutalHack.ggj19.General
                 moveSouth = false;
                 if (playerPosition.Neighbours.ContainsKey(South))
                 {
-                    playerPosition = playerPosition.Neighbours[South];
+                    desiredPlayerPosition = playerPosition.Neighbours[South];
                     moved = true;
                 }
             }
@@ -162,7 +149,7 @@ namespace BrutalHack.ggj19.General
                 moveWest = false;
                 if (playerPosition.Neighbours.ContainsKey(West))
                 {
-                    playerPosition = playerPosition.Neighbours[West];
+                    desiredPlayerPosition = playerPosition.Neighbours[West];
                     moved = true;
                 }
             }
@@ -172,7 +159,7 @@ namespace BrutalHack.ggj19.General
                 moveEast = false;
                 if (playerPosition.Neighbours.ContainsKey(East))
                 {
-                    playerPosition = playerPosition.Neighbours[East];
+                    desiredPlayerPosition = playerPosition.Neighbours[East];
                     moved = true;
                 }
             }
@@ -180,14 +167,32 @@ namespace BrutalHack.ggj19.General
             if (moved)
             {
                 moved = false;
+                Node oldPosition = playerPosition;
+                playerPosition = desiredPlayerPosition;
                 PlayerMarker.transform.position =
                     GameGraphGenerator.nodesToGameObjects[playerPosition].transform.position;
                 GameGraphGenerator.nodesToGameObjects[playerPosition].GetComponent<Animator>().SetTrigger(Jump);
                 horizontalMovementEnabled = false;
                 verticalMovementEnabled = false;
+
+                List<Node> path = nodeCollectionLogic.TrackAndHandleMove(oldPosition, playerPosition);
+                if (!path.IsNullOrEmpty())
+                {
+                    FillCycle(path);
+                }
             }
         }
 
+        public void FillCycle(List<Node> cycleNodes)
+        {
+            var colliderObject = Instantiate(polygonColliderPrefab);
+            PolygonCollider2D polygonCollider2D = colliderObject.GetComponent<PolygonCollider2D>();
+            Vector3[] cycleCoordinates =
+                cycleNodes.Select(node => GameGraphGenerator.nodesToGameObjects[node].transform.position).ToArray();
+            polygonCollider2D.points = cycleCoordinates.Select(vector3 => new Vector2(vector3.x, vector3.y)).ToArray();
+            colliderObject.GetComponent<MarkGraphElements>().outerNodeCycle = cycleNodes;
+        }
+        
         private void UpdateInput()
         {
             Keyboard keyboard = InputSystem.GetDevice<Keyboard>();

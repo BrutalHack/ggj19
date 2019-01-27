@@ -1,8 +1,5 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using BrutalHack.ggj19.General.Music;
-using BrutalHack.ggj19.Music;
-using MusicXml.Domain;
 using TMPro;
 using UnityEngine;
 
@@ -25,7 +22,7 @@ public class MusicText : MonoBehaviour
         textMeshPro.text = "Snare";
         StartCoroutine(ClearTextAfterDelay());
     }
-    
+
     private void OnBass(TimedNote note)
     {
         textMeshPro.text = "Bass";
@@ -41,6 +38,5 @@ public class MusicText : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
     }
 }
