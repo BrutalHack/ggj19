@@ -46,6 +46,7 @@ namespace BrutalHack.ggj19.General
         float oldVertical2;
 
         private float inputAxisDeadzone = 0.02f;
+        private static readonly int Happy = Animator.StringToHash("happy");
 
         void Start()
         {
@@ -191,6 +192,7 @@ namespace BrutalHack.ggj19.General
                 PlayerMarker.transform.position =
                     GameGraphGenerator.nodesToGameObjects[playerPosition].transform.position;
                 GameGraphGenerator.nodesToGameObjects[playerPosition].GetComponent<Animator>().SetTrigger(Jump);
+                GameGraphGenerator.nodesToGameObjects[playerPosition].GetComponent<Animator>().SetBool(Happy, true);
                 audioSource.clip = joySounds[Random.Range(0, joySounds.Length - 1)];
                 audioSource.Play();
                 horizontalMovementEnabled = false;
