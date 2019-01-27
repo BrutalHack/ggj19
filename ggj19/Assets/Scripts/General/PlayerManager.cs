@@ -36,11 +36,13 @@ namespace BrutalHack.ggj19.General
         private AudioSource audioSource;
 
         private NodeCollectionLogic nodeCollectionLogic;
-        
+
         float oldHorizontal1;
         float oldHorizontal2;
         float oldVertical1;
         float oldVertical2;
+
+        public MusicGuidanceController musicGuidanceController;
 
         private float inputAxisDeadzone = 0.02f;
         private static readonly int Happy = Animator.StringToHash("happy");
@@ -211,10 +213,10 @@ namespace BrutalHack.ggj19.General
                 Debug.Log("Application Quit");
                 Application.Quit();
             }
-            
-            float horizontal1 = Input.GetAxis("Horizontal 1");
+
+            float horizontal1 = Input.GetAxis("Horizontal");
             float horizontal2 = Input.GetAxis("Horizontal 2");
-            float vertical1 = Input.GetAxis("Vertical 1");
+            float vertical1 = Input.GetAxis("Vertical");
             float vertical2 = Input.GetAxis("Vertical 2");
 
             if (verticalMovementEnabled)

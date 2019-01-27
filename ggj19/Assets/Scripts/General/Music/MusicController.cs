@@ -19,18 +19,23 @@ namespace BrutalHack.ggj19.General.Music
         public delegate void OnTime();
 
         public event OnNote OnSnare;
+        public event OnNote OnSnareGuidance;
         public event OnNote OnBass;
+        public event OnNote OnBassGuidance;
         public event OnTime OnSongFinished;
 
         public float eventOffsetInSeconds = -0.1f;
 
         public Queue<TimedNote> notes = new Queue<TimedNote>();
+        public Queue<TimedNote> noteGuidance = new Queue<TimedNote>();
+
         private float musicStartTimestamp;
         private bool musicIsPlaying;
         private bool musicIsFinished;
 
         public bool autoplay;
         public float autoplayDelay = 3f;
+        public double guidanceOffset = -1f;
 
         private void Start()
         {
@@ -63,6 +68,7 @@ namespace BrutalHack.ggj19.General.Music
         private void Update()
         {
             UpdateNotes();
+            UpdateNoteGuidance();
         }
 
         private void UpdateNotes()
@@ -86,6 +92,23 @@ namespace BrutalHack.ggj19.General.Music
                     musicIsFinished = true;
                     OnSongFinished?.Invoke();
                 }
+            }
+        }
+        private void UpdateNoteGuidance()
+        {
+            if (!musicIsPlaying || musicIsFinished)
+            {
+                return;
+            }
+
+            double relativeMusicTimestamp = Time.time - musicStartTimestamp;
+
+            if (noteGuidance.Count > 0)
+            {
+                double noteTimestamp = noteGuidance.Peek().timestamp;
+                if (!(noteTimestamp < relativeMusicTimestamp)) return;
+                TimedNote note = noteGuidance.Dequeue();
+                FireNoteGuidanceEvent(note);
             }
         }
 
@@ -118,6 +141,7 @@ namespace BrutalHack.ggj19.General.Music
                             NoteType noteType =
                                 ProcessMidiNoteType(int.Parse(eventNode["NoteOn"].Attributes["Note"].InnerText));
                             notes.Enqueue(new TimedNote {type = noteType, timestamp = timeStamp});
+                            noteGuidance.Enqueue(new TimedNote {type = noteType, timestamp = timeStamp - guidanceOffset});
                         }
                     }
                 }
@@ -170,6 +194,23 @@ namespace BrutalHack.ggj19.General.Music
                     break;
                 case NoteType.Snare:
                     OnSnare?.Invoke(note);
+                    break;
+                default:
+                    throw new InvalidOperationException();
+            }
+        }
+        
+        private void FireNoteGuidanceEvent(TimedNote note)
+        {
+            switch (note.type)
+            {
+                case NoteType.Bass:
+                    OnBassGuidance?.Invoke(note);
+                    break;
+                case NoteType.Rest:
+                    break;
+                case NoteType.Snare:
+                    OnSnareGuidance?.Invoke(note);
                     break;
                 default:
                     throw new InvalidOperationException();
