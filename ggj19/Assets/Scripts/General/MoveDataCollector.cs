@@ -28,6 +28,16 @@ namespace BrutalHack.ggj19.General
         {
             if (CollidedWithPassedNodes(from, to))
             {
+                Debug.Log("Try to find circle");
+                List<Node> result = TryToFindCirclePath(to, from);
+                if (result != null)
+                {
+                    Debug.Log("RESULT: ");
+                    foreach (var node in result)
+                    {
+                        Debug.Log("=> " + node.Coordinate);
+                    }
+                }
             }
         }
 
@@ -41,36 +51,87 @@ namespace BrutalHack.ggj19.General
             return collisionWithPassedNods;
         }
 
-        public List<Node> TryToFindCirclePath(Node start)
+        public List<Node> TryToFindCirclePath(Node first, Node second)
         {
-            List<Path> startPaths = GenerateStartPaths(start);
+            List<Path> startPaths = GenerateStartPaths(first, second);
             Debug.Log("StartPaths = " + startPaths.Count);
             if (startPaths.Count == 0)
             {
                 return null;
             }
 
-            return SpreadOutWithPaths(startPaths, start);
+            return SpreadOutWithPaths(startPaths, first);
         }
 
-        public List<Node> SpreadOutWithPaths(List<Path> startPaths, Node start)
+        public List<Node> SpreadOutWithPaths(List<Path> startPaths, Node first)
         {
             int generation = 0;
             List<Path> oldGeneration = startPaths;
             while (oldGeneration != null && oldGeneration.Count > 0)
             {
                 generation++;
-                Debug.Log("Generation: " + generation);
+                Debug.Log("Generation: " + generation + " OldGenerations: " + oldGeneration.Count);
                 List<Path> newGeneration = new List<Path>();
 
                 foreach (var path in oldGeneration.ToList())
                 {
+                    List<Path> pathExtensions = GenerateHigherPaths(path);
+                    Debug.Log("Path Extensions: " + pathExtensions.Count);
+
+                    foreach (var pathExtension in pathExtensions)
+                    {
+                        if (CanReachStartNode(pathExtension, first))
+                        {
+                            return pathExtension.path;
+                        }
+                    }
+
+                    newGeneration.AddRange(pathExtensions);
                 }
 
                 oldGeneration = newGeneration;
             }
 
             return null;
+        }
+
+        public bool CanReachStartNode(Path path, Node start)
+        {
+            foreach (var neighbour in path.GetLastNode().GetNeighbours())
+            {
+                if (start.Equals(neighbour) && ConnectionTouched(start, neighbour))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        
+        public Path AnyPathEndsIntersect(List<Path> mainPaths, List<Path> secondaryPaths)
+        {
+            foreach (var mainPath in mainPaths)
+            {
+                foreach (var secondaryPath in secondaryPaths)
+                {
+                    if (mainPath.GetLastNode().Equals(secondaryPath.GetLastNode()))
+                    {
+                        return CombinePaths(mainPath, secondaryPath);
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        public Path CombinePaths(Path main, Path second)
+        {
+            for (int i = second.path.Count - 2; i > 0; i--)
+            {
+                main.path.Add(second.path[i]);
+            }
+
+            return main;
         }
 
         public List<Path> GenerateHigherPaths(Path path)
@@ -90,18 +151,13 @@ namespace BrutalHack.ggj19.General
             return newPaths;
         }
 
-        public List<Path> GenerateStartPaths(Node start)
+        public List<Path> GenerateStartPaths(Node start, Node second)
         {
             List<Path> paths = new List<Path>();
-            foreach (var neighbour in start.GetNeighbours())
-            {
-                if (Touched(start, neighbour))
-                {
-                    Path path = new Path();
-                    path.path.Add(start);
-                    path.path.Add(neighbour);
-                }
-            }
+            Path path = new Path();
+            path.path.Add(start);
+            path.path.Add(second);
+            paths.Add(path);
 
             return paths;
         }
