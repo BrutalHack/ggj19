@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace BrutalHack.ggj19.General
@@ -16,19 +17,37 @@ namespace BrutalHack.ggj19.General
         public SpriteRenderer Head;
         public SpriteRenderer Body;
 
+        private bool isColored;
+
         private void Start()
         {
-            RandomizeSprite(Hair, HairSprites, HairColors);
-            RandomizeSprite(Head, HeadSprites, HeadColors);
-            RandomizeSprite(Body, BodySprites, BodyColors);
+            RandomizeSprite(Hair, HairSprites);
+            RandomizeSprite(Head, HeadSprites);
+            RandomizeSprite(Body, BodySprites);
         }
 
-        private void RandomizeSprite(SpriteRenderer spriteRenderer, Sprite[] sprites, Color[] colors)
+        [UsedImplicitly]
+        public void RandomizeColors()
+        {
+            if (isColored)
+            {
+                return;
+            }
+
+            RandomizeColor(Hair, HairColors);
+            RandomizeColor(Head, HeadColors);
+            RandomizeColor(Body, BodyColors);
+        }
+
+        private void RandomizeSprite(SpriteRenderer spriteRenderer, Sprite[] sprites)
         {
             int spriteIndex = Random.Range(0, sprites.Length - 1);
-            int colorIndex = Random.Range(0, colors.Length - 1);
-
             spriteRenderer.sprite = sprites[spriteIndex];
+        }
+
+        private void RandomizeColor(SpriteRenderer spriteRenderer, Color[] colors)
+        {
+            int colorIndex = Random.Range(0, colors.Length - 1);
             spriteRenderer.color = colors[colorIndex];
         }
     }

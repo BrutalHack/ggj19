@@ -571,8 +571,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ceb533c0a7b9a406687ae90d4286bc7c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxZoom: 58
-  zoomSpeed: 0.3
+  maxZoom: 40
+  zoomSpeed: 0.4
 --- !u!1001 &1397630264
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -776,8 +776,21 @@ MonoBehaviour:
   moveEast: 0
   musicController: {fileID: 1578839139}
   inputTimeout: 0.3
-  polygonColliderPrefab: {fileID: 2619839251847934509, guid: a2dfd97e31f644c6881fd019c10e8b75,
-    type: 3}
+  fillCycleClass: {fileID: 0}
+  fillCycle: 0
+  joySounds:
+  - {fileID: 8300000, guid: e378d91350487f9448d4d838ef7c68b7, type: 3}
+  - {fileID: 8300000, guid: b0918fadb522c474a9958f9f9837d2aa, type: 3}
+  - {fileID: 8300000, guid: 0efc7cfc4be002742a090d6f3b0d5ff5, type: 3}
+  - {fileID: 8300000, guid: 329b8e0b612268c42806111a820c3002, type: 3}
+  - {fileID: 8300000, guid: 2d746c7fb474fb24daa3241cab4975ce, type: 3}
+  - {fileID: 8300000, guid: 9f0da485f496c9e4982560e4778f6719, type: 3}
+  - {fileID: 8300000, guid: 690f71a2bcbbe8640a107da8c18106b9, type: 3}
+  - {fileID: 8300000, guid: 218407ae7450cea4fbf1a9a28bfcb8c3, type: 3}
+  - {fileID: 8300000, guid: e82e7fa7798f20741951445c7fd3f396, type: 3}
+  - {fileID: 8300000, guid: e69fadcc463a0eb4ca381d16ffd7a815, type: 3}
+  - {fileID: 8300000, guid: 8fda9a4b983c06c48b52783676249f96, type: 3}
+  - {fileID: 8300000, guid: ec67e31f9546aee419f0f0c78b3e3b06, type: 3}
 --- !u!4 &2074775066
 Transform:
   m_ObjectHideFlags: 0

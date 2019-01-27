@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BrutalHack.ggj19.General.Music;
-using Sirenix.Utilities;
 using UnityEngine;
-using UnityEngine.Experimental.Input;
 using static BrutalHack.ggj19.General.DirectionEnum;
 
 namespace BrutalHack.ggj19.General
@@ -36,12 +34,16 @@ namespace BrutalHack.ggj19.General
         
         public GameObject polygonColliderPrefab;
 
+        public AudioClip[] joySounds;
+        private AudioSource audioSource;
+
         void Start()
         {
             nodeCollectionLogic = NodeCollectionLogic.Instance;
             StartCoroutine(PlacePlayer());
             musicController.OnBass += OnBass;
             musicController.OnSnare += OnSnare;
+            audioSource = GetComponent<AudioSource>();
         }
 
         private void OnSnare(TimedNote note)
@@ -172,11 +174,13 @@ namespace BrutalHack.ggj19.General
                 PlayerMarker.transform.position =
                     GameGraphGenerator.nodesToGameObjects[playerPosition].transform.position;
                 GameGraphGenerator.nodesToGameObjects[playerPosition].GetComponent<Animator>().SetTrigger(Jump);
+                audioSource.clip = joySounds[Random.Range(0, joySounds.Length - 1)];
+                audioSource.Play();
                 horizontalMovementEnabled = false;
                 verticalMovementEnabled = false;
 
                 List<Node> path = nodeCollectionLogic.TrackAndHandleMove(oldPosition, playerPosition);
-                if (!path.IsNullOrEmpty())
+                if (path != null && path.Count > 0)
                 {
                     FillCycle(path);
                 }
@@ -195,15 +199,19 @@ namespace BrutalHack.ggj19.General
         
         private void UpdateInput()
         {
-            Keyboard keyboard = InputSystem.GetDevice<Keyboard>();
+            float horizontal1 = Input.GetAxis("Horizontal 1");
+            float horizontal2 = Input.GetAxis("Horizontal 2");
+            float vertical1 = Input.GetAxis("Vertical 1");
+            float vertical2 = Input.GetAxis("Vertical 2");
+
             if (verticalMovementEnabled)
             {
-                if (keyboard.wKey.wasPressedThisFrame || keyboard.upArrowKey.wasPressedThisFrame)
+                if (vertical1  > 0f)
                 {
                     MoveNorth();
                 }
 
-                if (keyboard.sKey.wasPressedThisFrame || keyboard.downArrowKey.wasPressedThisFrame)
+                if (vertical1 < 0f)
                 {
                     MoveSouth();
                 }
@@ -211,12 +219,12 @@ namespace BrutalHack.ggj19.General
 
             if (horizontalMovementEnabled)
             {
-                if (keyboard.aKey.wasPressedThisFrame || keyboard.leftArrowKey.wasPressedThisFrame)
+                if (horizontal1 < 0f)
                 {
                     MoveWest();
                 }
 
-                if (keyboard.dKey.wasPressedThisFrame || keyboard.rightArrowKey.wasPressedThisFrame)
+                if (horizontal1 > 0f)
                 {
                     MoveEast();
                 }
