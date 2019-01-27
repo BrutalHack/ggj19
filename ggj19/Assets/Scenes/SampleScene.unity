@@ -499,6 +499,7 @@ GameObject:
   m_Component:
   - component: {fileID: 974976939}
   - component: {fileID: 974976938}
+  - component: {fileID: 974976940}
   m_Layer: 0
   m_Name: CM vcam1
   m_TagString: Untagged
@@ -558,6 +559,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &974976940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 974976937}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb533c0a7b9a406687ae90d4286bc7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxZoom: 58
+  zoomSpeed: 0.3
 --- !u!1001 &1397630264
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -733,6 +748,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2074775066}
   - component: {fileID: 2074775065}
+  - component: {fileID: 2074775067}
   m_Layer: 0
   m_Name: PlayerManager
   m_TagString: Untagged
@@ -761,6 +777,8 @@ MonoBehaviour:
   moveEast: 0
   musicController: {fileID: 1578839139}
   inputTimeout: 0.3
+  fillCycleClass: {fileID: 2074775067}
+  fillCycle: 0
 --- !u!4 &2074775066
 Transform:
   m_ObjectHideFlags: 0
@@ -775,6 +793,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2074775067
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2074775064}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5269a111e19041c8986d6c0f3e701839, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  graph: {fileID: 892899991}
 --- !u!1001 &6038126726230343914
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -1,8 +1,10 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using BrutalHack.ggj19.Music;
 using UnityEngine;
 using UnityEngine.Experimental.Input;
 using UnityEngine.Serialization;
+using static BrutalHack.ggj19.General.DirectionEnum;
 
 namespace BrutalHack.ggj19.General
 {
@@ -22,6 +24,9 @@ namespace BrutalHack.ggj19.General
         private bool verticalMovementEnabled;
 
         public float inputTimeout = 0.3f;
+        public FillCycleClass fillCycleClass;
+        public bool fillCycle;
+        public NodeCollectionLogic nodeCollector;
 
         private float snareTimer;
         private float bassTimer;
@@ -40,17 +45,17 @@ namespace BrutalHack.ggj19.General
         {
             snareTimer = inputTimeout;
             verticalMovementEnabled = true;
-            ActivateLine(DirectionEnum.North, ActivateVertical);
-            ActivateLine(DirectionEnum.South, ActivateVertical);
+            ActivateLine(North, ActivateVertical);
+            ActivateLine(South, ActivateVertical);
         }
 
         private void OnBass(TimedNote note)
         {
             bassTimer = inputTimeout;
             horizontalMovementEnabled = true;
-            
-            ActivateLine(DirectionEnum.East, ActivateHorizontal);
-            ActivateLine(DirectionEnum.West, ActivateHorizontal);
+
+            ActivateLine(East, ActivateHorizontal);
+            ActivateLine(West, ActivateHorizontal);
         }
 
         private void ActivateLine(DirectionEnum direction, int trigger)
@@ -115,12 +120,28 @@ namespace BrutalHack.ggj19.General
                 return;
             }
 
+            if (fillCycle)
+            {
+                fillCycleClass.FillCycle(new List<Node>
+                {
+                    playerPosition.Neighbours[East],
+                    playerPosition.Neighbours[East].Neighbours[East],
+                    playerPosition.Neighbours[East].Neighbours[East].Neighbours[North],
+                    playerPosition.Neighbours[East].Neighbours[East].Neighbours[North].Neighbours[West],
+                    playerPosition.Neighbours[East].Neighbours[East].Neighbours[North].Neighbours[West].Neighbours[North],
+                    playerPosition.Neighbours[East].Neighbours[East].Neighbours[North].Neighbours[West].Neighbours[North].Neighbours[West],
+                    playerPosition.Neighbours[East].Neighbours[East].Neighbours[North].Neighbours[West].Neighbours[North].Neighbours[West].Neighbours[South],
+                    playerPosition.Neighbours[East].Neighbours[East].Neighbours[North].Neighbours[West].Neighbours[North].Neighbours[West].Neighbours[South].Neighbours[South]
+                });
+                fillCycle = false;
+            }
+
             if (moveNorth)
             {
                 moveNorth = false;
-                if (playerPosition.Neighbours.ContainsKey(DirectionEnum.North))
+                if (playerPosition.Neighbours.ContainsKey(North))
                 {
-                    playerPosition = playerPosition.Neighbours[DirectionEnum.North];
+                    playerPosition = playerPosition.Neighbours[North];
                     moved = true;
                 }
             }
@@ -128,9 +149,9 @@ namespace BrutalHack.ggj19.General
             if (moveSouth)
             {
                 moveSouth = false;
-                if (playerPosition.Neighbours.ContainsKey(DirectionEnum.South))
+                if (playerPosition.Neighbours.ContainsKey(South))
                 {
-                    playerPosition = playerPosition.Neighbours[DirectionEnum.South];
+                    playerPosition = playerPosition.Neighbours[South];
                     moved = true;
                 }
             }
@@ -138,9 +159,9 @@ namespace BrutalHack.ggj19.General
             if (moveWest)
             {
                 moveWest = false;
-                if (playerPosition.Neighbours.ContainsKey(DirectionEnum.West))
+                if (playerPosition.Neighbours.ContainsKey(West))
                 {
-                    playerPosition = playerPosition.Neighbours[DirectionEnum.West];
+                    playerPosition = playerPosition.Neighbours[West];
                     moved = true;
                 }
             }
@@ -148,9 +169,9 @@ namespace BrutalHack.ggj19.General
             if (moveEast)
             {
                 moveEast = false;
-                if (playerPosition.Neighbours.ContainsKey(DirectionEnum.East))
+                if (playerPosition.Neighbours.ContainsKey(East))
                 {
-                    playerPosition = playerPosition.Neighbours[DirectionEnum.East];
+                    playerPosition = playerPosition.Neighbours[East];
                     moved = true;
                 }
             }

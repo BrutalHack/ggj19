@@ -10,21 +10,31 @@ namespace BrutalHack.ggj19.General
         public GraphGenerator graphGenerator;
 
         public Dictionary<Node, GameObject> nodesToGameObjects;
+        public Dictionary<GameObject, Node> GameObjectsToNodes;
         public Dictionary<Vector2, GameObject> centerToLineRenderer;
+        public Dictionary<GameObject, Vector2> lineRendererToCenter;
         private float manipulationPercentage = 0.2f;
         private List<Node> nodes;
 
+        public static GameGraphGenerator Instance;
+
         private void Start()
         {
+            Instance = this;
             graphGenerator = new GraphGenerator();
             graphGenerator.GenerateGraph();
             nodes = new List<Node>(graphGenerator.nodes.Values);
 
             nodesToGameObjects = new Dictionary<Node, GameObject>();
+            GameObjectsToNodes = new Dictionary<GameObject, Node>();
+
             centerToLineRenderer = new Dictionary<Vector2, GameObject>();
+            lineRendererToCenter = new Dictionary<GameObject, Vector2>();
             foreach (var node in nodes)
             {
-                nodesToGameObjects.Add(node, CreateGameObject(node));
+                GameObject nodeGameObject = CreateGameObject(node);
+                nodesToGameObjects.Add(node, nodeGameObject);
+                GameObjectsToNodes.Add(nodeGameObject, node);
             }
 
             foreach (var node in nodes)
@@ -40,13 +50,19 @@ namespace BrutalHack.ggj19.General
                 Vector2 center = CalculateLineCenter(node, neighbour.Value);
                 if (!centerToLineRenderer.ContainsKey(center))
                 {
+                    Vector3 fromPosition = nodesToGameObjects[node].transform.position + new Vector3(0f, 0f, 0.1f);
+                    Vector3 toPosition = nodesToGameObjects[neighbour.Value].transform.position + new Vector3(0f, 0f, 0.1f);
+                    Vector3 centerPosition = (fromPosition + toPosition) / 2;
+                    
                     GameObject line = Instantiate(linePrefab, transform);
+                    line.transform.position=  centerPosition;
                     LineRenderer lineRenderer = line.GetComponent<LineRenderer>();
                     lineRenderer.SetPosition(0,
-                        nodesToGameObjects[node].transform.position + new Vector3(0f, 0f, 0.1f));
+                        fromPosition);
                     lineRenderer.SetPosition(1,
-                        nodesToGameObjects[neighbour.Value].transform.position + new Vector3(0f, 0f, 0.1f));
+                        toPosition);
                     centerToLineRenderer.Add(center, line);
+                    lineRendererToCenter.Add(line, center);
                 }
             }
         }
