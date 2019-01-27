@@ -10,20 +10,15 @@ namespace BrutalHack.ggj19.General
         public ISet<Node> passedNodes = new HashSet<Node>();
         public ISet<Node> deadNodes = new HashSet<Node>();
         public ISet<Vector2> passedConnections = new HashSet<Vector2>();
-        public ISet<Vector2> deadConnections = new HashSet<Vector2>();
 
-        public void TrackAndHandleMove(Node fromNode, Node toNode)
+        public List<Node> TrackAndHandleMove(Node fromNode, Node toNode)
         {
             if (!passedNodes.Contains(fromNode))
             {
                 passedNodes.Add(fromNode);
             }
 
-            //TODO fix this must check the nodes in diagonal !!!
-            if (!deadNodes.Contains(fromNode) && IsDeadNode(fromNode))
-            {
-                deadNodes.Add(fromNode);
-            }
+            CollectDeadNodes(fromNode);
 
             Vector2 connection = CalculateLineCenter(fromNode, toNode);
             if (!passedConnections.Contains(connection))
@@ -33,12 +28,34 @@ namespace BrutalHack.ggj19.General
 
             if (passedNodes.Contains(toNode))
             {
-                //TODO work in progress!!!
-                CheckForCircle(toNode);
+                Path circlePath = CheckForCircle(toNode);
+                if (circlePath != null)
+                {
+                    CollectDeadNodes(circlePath);
+                    return circlePath.path;
+                }
             }
             else
             {
                 passedNodes.Add(toNode);
+            }
+
+            return null;
+        }
+
+        private void CollectDeadNodes(Path path)
+        {
+            foreach (var node in path.path)
+            {
+                CollectDeadNodes(node);
+            }
+        }
+
+        private void CollectDeadNodes(Node node)
+        {
+            if (!deadNodes.Contains(node) && IsDeadNode(node))
+            {
+                deadNodes.Add(node);
             }
         }
 
@@ -50,8 +67,7 @@ namespace BrutalHack.ggj19.General
         private Path CheckForCircle(Node startNode)
         {
             List<Path> oldPaths = GenerateStartPaths(startNode);
-            
-            //TODO while schleife mit einer sehr intelegenten abbruch bedingung! => oldPaths not empty
+
             while (!oldPaths.IsNullOrEmpty())
             {
                 List<Path> newPaths = new List<Path>();
@@ -60,21 +76,71 @@ namespace BrutalHack.ggj19.General
                     List<Path> newGeneratedPaths = TrackNextStep(path);
                     oldPaths.Remove(path);
 
+                    Path circlePath = null;
                     //if on of new generated paths reached startNode => exit you have a path!
-                    
-                    
+                    circlePath = AnyPathBecameACircle(newGeneratedPaths);
+                    if (circlePath != null)
+                    {
+                        return circlePath;
+                    }
 
                     //if on of the new generated paths reached the lastNode of oldPaths => exit you have a path!
+                    circlePath = AnyPathEndsIntersect(newGeneratedPaths, oldPaths);
+                    if (circlePath != null)
+                    {
+                        return circlePath;
+                    }
 
                     //if on of the new generated paths reached the lastNode of newPaths => exit you have a path!
-
-                    //TODO maybe just check all new ends with existing old ends.
-
+                    circlePath = AnyPathEndsIntersect(newGeneratedPaths, newPaths);
+                    if (circlePath != null)
+                    {
+                        return circlePath;
+                    }
 
                     newPaths.AddRange(newGeneratedPaths);
                 }
+
                 oldPaths = newPaths;
-                //TODO end of the super intelligent while loop
+            }
+
+            return null;
+        }
+
+        private Path AnyPathEndsIntersect(List<Path> mainPaths, List<Path> secondaryPaths)
+        {
+            foreach (var mainPath in mainPaths)
+            {
+                foreach (var secondaryPath in secondaryPaths)
+                {
+                    if (mainPath.GetLastNode().Equals(secondaryPath.GetLastNode()))
+                    {
+                        return CombinePaths(mainPath, secondaryPath);
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private Path CombinePaths(Path main, Path second)
+        {
+            for (int i = second.path.Count - 1; i >= 0; i--)
+            {
+                main.path.Add(second.path[i]);
+            }
+
+            return main;
+        }
+
+        private Path AnyPathBecameACircle(List<Path> paths)
+        {
+            foreach (var path in paths)
+            {
+                if (path.IsACircle())
+                {
+                    return path;
+                }
             }
 
             return null;
@@ -86,8 +152,8 @@ namespace BrutalHack.ggj19.General
             Node lastNode = path.GetLastNode();
             foreach (var neighbour in lastNode.GetNeighbours())
             {
-                if (path.NotInPath(neighbour) && ConnectionToNeighbourPassed(lastNode, neighbour)
-                    && !deadNodes.Contains(neighbour))
+                if (path.NotInPathWithCircleException(neighbour) && ConnectionToNeighbourPassed(lastNode, neighbour)
+                                                                 && !deadNodes.Contains(neighbour))
                 {
                     Path newPath = new Path(path.path);
                     newPath.path.Add(neighbour);
@@ -103,7 +169,7 @@ namespace BrutalHack.ggj19.General
             foreach (var neighbour in node.GetNeighbours())
             {
                 if (ConnectionToNeighbourPassed(node, neighbour)
-                && !deadNodes.Contains(neighbour))
+                    && !deadNodes.Contains(neighbour))
                 {
                     Path path = new Path();
                     path.path.Add(node);
@@ -126,17 +192,67 @@ namespace BrutalHack.ggj19.General
             {
                 return true;
             }
-            foreach (var neighbour in node.GetNeighbours())
+
+            foreach (var neighbourEntry in node.Neighbours)
             {
-                if (!passedNodes.Contains(neighbour)
-                    || !passedConnections.Contains(CalculateLineCenter(node, neighbour)))
+                LookupResult result = LeftLookUpComplete(node, neighbourEntry.Value, neighbourEntry.Key);
+                if (result.Equals(LookupResult.Bad) || result.Equals(LookupResult.Back))
                 {
                     return false;
                 }
+                //LookupResult.Good => sector dead, check the next sector.
             }
 
             return true;
         }
+
+        private LookupResult LeftLookUpComplete(Node startNode, Node node, DirectionEnum direction)
+        {
+            DirectionEnum reverseDirection = direction.Reverse(); 
+            DirectionEnum currentDirection = reverseDirection;
+            for (int i = 0; i < 4; i++)
+            {
+                DirectionEnum leftDirection = currentDirection.Left();
+                if (reverseDirection.Equals(leftDirection))
+                {
+                    return LookupResult.Back;
+                }
+
+                Node leftNeighbour = null;
+                if (node.Neighbours.ContainsKey(leftDirection))
+                {
+                    leftNeighbour = node.Neighbours[leftDirection];
+
+                    if (!passedConnections.Contains(CalculateLineCenter(node, leftNeighbour)))
+                    {
+                        return LookupResult.Bad;
+                    }
+
+                    if (startNode.Equals(leftNeighbour))
+                    {
+                        return LookupResult.Good;
+                    }
+
+                    LookupResult result = LeftLookUpComplete(startNode, leftNeighbour, leftDirection);
+                    if (!result.Equals(LookupResult.Back))
+                    {
+                        return result;
+                    }
+                }
+
+                currentDirection = leftDirection;
+            }
+
+            Debug.Log("Should not happen :)");
+            return LookupResult.Back;
+        }
+    }
+
+    enum LookupResult
+    {
+        Good,
+        Bad,
+        Back
     }
 
     class Path
@@ -158,9 +274,24 @@ namespace BrutalHack.ggj19.General
             return path.LastOrDefault();
         }
 
+        public Node GetFirstNode()
+        {
+            return path.FirstOrDefault();
+        }
+
+        public bool NotInPathWithCircleException(Node node)
+        {
+            return NotInPath(node) || (path.Count > 3 && node.Equals(GetFirstNode()));
+        }
+
         public bool NotInPath(Node node)
         {
             return !path.Contains(node);
+        }
+
+        public bool IsACircle()
+        {
+            return GetFirstNode().Equals(GetLastNode());
         }
     }
 }
