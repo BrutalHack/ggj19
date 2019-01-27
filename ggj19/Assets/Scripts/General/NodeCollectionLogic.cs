@@ -188,6 +188,7 @@ namespace BrutalHack.ggj19.General
                     Path path = new Path();
                     path.path.Add(node);
                     path.path.Add(neighbour);
+                    paths.Add(path);
                 }
             }
 
@@ -270,7 +271,7 @@ namespace BrutalHack.ggj19.General
         Back
     }
 
-    class Path
+    public class Path
     {
         public List<Node> path;
 
@@ -286,12 +287,12 @@ namespace BrutalHack.ggj19.General
 
         public Node GetLastNode()
         {
-            return path.LastOrDefault();
+            return path.Last();
         }
 
         public Node GetFirstNode()
         {
-            return path.FirstOrDefault();
+            return path.First();
         }
 
         public bool NotInPathWithCircleException(Node node)
