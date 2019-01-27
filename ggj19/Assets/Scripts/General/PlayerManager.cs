@@ -1,9 +1,11 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using BrutalHack.ggj19.General.Music;
 using UnityEngine;
 using static BrutalHack.ggj19.General.DirectionEnum;
+using Random = UnityEngine.Random;
 
 namespace BrutalHack.ggj19.General
 {
@@ -31,11 +33,18 @@ namespace BrutalHack.ggj19.General
         private static readonly int ActivateHorizontal = Animator.StringToHash("activateHorizontal");
         private static readonly int Jump = Animator.StringToHash("jump");
         private NodeCollectionLogic nodeCollectionLogic;
-        
+
         public GameObject polygonColliderPrefab;
 
         public AudioClip[] joySounds;
         private AudioSource audioSource;
+
+        float oldHorizontal1;
+        float oldHorizontal2;
+        float oldVertical1;
+        float oldVertical2;
+
+        private float inputAxisDeadzone = 0.02f;
 
         void Start()
         {
@@ -196,7 +205,7 @@ namespace BrutalHack.ggj19.General
             polygonCollider2D.points = cycleCoordinates.Select(vector3 => new Vector2(vector3.x, vector3.y)).ToArray();
             colliderObject.GetComponent<MarkGraphElements>().outerNodeCycle = cycleNodes;
         }
-        
+
         private void UpdateInput()
         {
             float horizontal1 = Input.GetAxis("Horizontal 1");
@@ -206,25 +215,45 @@ namespace BrutalHack.ggj19.General
 
             if (verticalMovementEnabled)
             {
-                if (vertical1  > 0f)
-                {
-                    MoveNorth();
-                }
-
-                if (vertical1 < 0f)
-                {
-                    MoveSouth();
-                }
+                HandlePlayerVerticalInput(vertical1, oldVertical1);
+                HandlePlayerVerticalInput(vertical2, oldVertical2);
             }
 
             if (horizontalMovementEnabled)
             {
-                if (horizontal1 < 0f)
+                HandlePlayerHorizontalInput(horizontal1, oldHorizontal1);
+            }
+
+            oldHorizontal1 = horizontal1;
+            oldHorizontal2 = horizontal2;
+            oldVertical1 = vertical1;
+            oldVertical2 = vertical2;
+        }
+
+        private void HandlePlayerVerticalInput(float newInput, float oldInput)
+        {
+            if (Math.Abs(oldInput) < inputAxisDeadzone && Math.Abs(newInput) > inputAxisDeadzone)
+            {
+                if (newInput < 0f)
+                {
+                    MoveSouth();
+                }
+                else
+                {
+                    MoveNorth();
+                }
+            }
+        }
+
+        private void HandlePlayerHorizontalInput(float newInput, float oldInput)
+        {
+            if (Math.Abs(oldInput) < inputAxisDeadzone && Math.Abs(newInput) > inputAxisDeadzone)
+            {
+                if (newInput < 0f)
                 {
                     MoveWest();
                 }
-
-                if (horizontal1 > 0f)
+                else
                 {
                     MoveEast();
                 }
