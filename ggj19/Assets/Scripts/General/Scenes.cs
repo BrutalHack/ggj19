@@ -2,8 +2,8 @@ namespace BrutalHack.ggj19.General
 {
     public enum Scenes
     {
-//        TitleScreen = 0,
-        GameScreen = 0,
-        ScoreScreen = 1
+        StartScreen = 0,
+        GameScreen = 1,
+        ScoreScreen = 2
     }
 }
