@@ -11,7 +11,7 @@ namespace BrutalHack.ggj19.General
         
         private void Start()
         {
-            int score = ScoreController.Instance.Score;
+            int score = NodeCollectionLogic.Instance.passedNodes.Count;
             String message = "You made " + score + " friends!";
             textMeshPro.text = message;
         }

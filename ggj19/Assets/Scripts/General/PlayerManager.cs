@@ -104,6 +104,11 @@ namespace BrutalHack.ggj19.General
 
         void Update()
         {
+            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Keypad7))
+            {
+                ShowScoreScene();
+            }
+
             UpdateSnareTimer();
             UpdateBassTimer();
             UpdateInput();
