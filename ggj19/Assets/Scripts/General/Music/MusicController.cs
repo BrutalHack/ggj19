@@ -94,6 +94,7 @@ namespace BrutalHack.ggj19.General.Music
                 }
             }
         }
+
         private void UpdateNoteGuidance()
         {
             if (!musicIsPlaying || musicIsFinished)
@@ -115,9 +116,12 @@ namespace BrutalHack.ggj19.General.Music
         private void ProcessMidiXml()
         {
             XmlDocument xmlDocument = new XmlDocument();
-            FileStream fileStream =
-                new FileStream("Assets/Music/Gute_Laune/Beat-midi.xml", FileMode.Open, FileAccess.Read);
-            xmlDocument.Load(fileStream);
+            TextAsset text = Resources.Load<TextAsset>("Beat-midi");
+            xmlDocument.LoadXml(text.text);
+//            FileStream fileStream =
+//                new FileStream("Assets/Music/Gute_Laune/Beat-midi.xml", FileMode.Open, FileAccess.Read);
+//            xmlDocument.Load(fileStream);
+
             XmlNode ticksPerBeatElement = xmlDocument.SelectSingleNode("//MIDIFile/TicksPerBeat");
             int ticksPerBeat = int.Parse(ticksPerBeatElement.InnerText);
             Debug.Log("ticks per Beat: " + ticksPerBeat);
@@ -141,7 +145,8 @@ namespace BrutalHack.ggj19.General.Music
                             NoteType noteType =
                                 ProcessMidiNoteType(int.Parse(eventNode["NoteOn"].Attributes["Note"].InnerText));
                             notes.Enqueue(new TimedNote {type = noteType, timestamp = timeStamp});
-                            noteGuidance.Enqueue(new TimedNote {type = noteType, timestamp = timeStamp - guidanceOffset});
+                            noteGuidance.Enqueue(
+                                new TimedNote {type = noteType, timestamp = timeStamp - guidanceOffset});
                         }
                     }
                 }
@@ -199,7 +204,7 @@ namespace BrutalHack.ggj19.General.Music
                     throw new InvalidOperationException();
             }
         }
-        
+
         private void FireNoteGuidanceEvent(TimedNote note)
         {
             switch (note.type)
