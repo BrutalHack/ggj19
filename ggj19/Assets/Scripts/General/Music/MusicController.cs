@@ -16,15 +16,18 @@ namespace BrutalHack.ggj19.General.Music
 
         public delegate void OnNote(TimedNote note);
 
+        public delegate void OnTime();
+
         public event OnNote OnSnare;
         public event OnNote OnBass;
-        public event OnNote OnRest;
+        public event OnTime OnSongFinished;
 
         public float eventOffsetInSeconds = -0.1f;
 
         public Queue<TimedNote> notes = new Queue<TimedNote>();
         private float musicStartTimestamp;
         private bool musicIsPlaying;
+        private bool musicIsFinished;
 
         public bool autoplay;
         public float autoplayDelay = 3f;
@@ -64,19 +67,24 @@ namespace BrutalHack.ggj19.General.Music
 
         private void UpdateNotes()
         {
-            if (!musicIsPlaying)
+            if (!musicIsPlaying || musicIsFinished)
             {
                 return;
             }
 
             double relativeMusicTimestamp = Time.time - musicStartTimestamp;
+
             if (notes.Count > 0)
             {
                 double noteTimestamp = notes.Peek().timestamp + eventOffsetInSeconds;
-                if (noteTimestamp < relativeMusicTimestamp)
+                if (!(noteTimestamp < relativeMusicTimestamp)) return;
+                TimedNote note = notes.Dequeue();
+                FireNoteEvent(note);
+
+                if (notes.Count == 0)
                 {
-                    TimedNote note = notes.Dequeue();
-                    FireNoteEvent(note);
+                    musicIsFinished = true;
+                    OnSongFinished?.Invoke();
                 }
             }
         }
@@ -159,7 +167,6 @@ namespace BrutalHack.ggj19.General.Music
                     OnBass?.Invoke(note);
                     break;
                 case NoteType.Rest:
-                    OnRest?.Invoke(note);
                     break;
                 case NoteType.Snare:
                     OnSnare?.Invoke(note);

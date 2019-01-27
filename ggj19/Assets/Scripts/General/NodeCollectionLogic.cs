@@ -8,18 +8,7 @@ namespace BrutalHack.ggj19.General
     {
         private static NodeCollectionLogic _instance;
 
-        public static NodeCollectionLogic Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    _instance = new NodeCollectionLogic();
-                }
-
-                return _instance;
-            }
-        }
+        public static NodeCollectionLogic Instance => _instance ?? (_instance = new NodeCollectionLogic());
 
         public ISet<Node> passedNodes = new HashSet<Node>();
         public ISet<Node> deadNodes = new HashSet<Node>();
@@ -261,6 +250,11 @@ namespace BrutalHack.ggj19.General
 
             Debug.Log("Should not happen :)");
             return LookupResult.Back;
+        }
+
+        public void CountScore()
+        {
+            ScoreController.Instance.Score = passedNodes.Count;
         }
     }
 
