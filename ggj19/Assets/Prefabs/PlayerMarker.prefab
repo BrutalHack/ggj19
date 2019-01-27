@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2421252700942652132}
   - component: {fileID: 3226581710138432317}
   - component: {fileID: 5989469352761086789}
-  - component: {fileID: 784612570}
+  - component: {fileID: 9065557510391771410}
   m_Layer: 0
   m_Name: PlayerMarker
   m_TagString: Untagged
@@ -176,7 +176,7 @@ TrailRenderer:
   m_MinVertexDistance: 0.1
   m_Autodestruct: 0
   m_Emitting: 1
---- !u!95 &784612570
+--- !u!95 &9065557510391771410
 Animator:
   serializedVersion: 3
   m_ObjectHideFlags: 0
