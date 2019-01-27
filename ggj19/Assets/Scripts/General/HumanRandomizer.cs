@@ -37,6 +37,7 @@ namespace BrutalHack.ggj19.General
             RandomizeColor(Hair, HairColors);
             RandomizeColor(Head, HeadColors);
             RandomizeColor(Body, BodyColors);
+            isColored = true;
         }
 
         private void RandomizeSprite(SpriteRenderer spriteRenderer, Sprite[] sprites)

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BrutalHack.ggj19.General.Music;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using static BrutalHack.ggj19.General.DirectionEnum;
 using Random = UnityEngine.Random;
 
@@ -52,7 +53,14 @@ namespace BrutalHack.ggj19.General
             StartCoroutine(PlacePlayer());
             musicController.OnBass += OnBass;
             musicController.OnSnare += OnSnare;
+            musicController.OnSongFinished += nodeCollectionLogic.CountScore;
+            musicController.OnSongFinished += ShowScoreScene;
             audioSource = GetComponent<AudioSource>();
+        }
+
+        private void ShowScoreScene()
+        {
+            SceneManager.LoadScene((int) Scenes.ScoreScreen, LoadSceneMode.Additive);
         }
 
         private void OnSnare(TimedNote note)
@@ -216,7 +224,7 @@ namespace BrutalHack.ggj19.General
             if (verticalMovementEnabled)
             {
                 HandlePlayerVerticalInput(vertical1, oldVertical1);
-                HandlePlayerVerticalInput(vertical2, oldVertical2);
+//                HandlePlayerVerticalInput(vertical2, oldVertical2);
             }
 
             if (horizontalMovementEnabled)

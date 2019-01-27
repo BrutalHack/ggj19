@@ -87,6 +87,10 @@ namespace BrutalHack.ggj19.General
         {
             float manipulationRange = CalculateManipulationRange();
 
+            if (node.Coordinate.Equals(Vector2.zero))
+            {
+                return Vector3.zero;
+            }
             return new Vector3(node.Coordinate.x + Random.Range(-manipulationRange, manipulationRange),
                 node.Coordinate.y + Random.Range(-manipulationRange, manipulationRange), 0);
         }
