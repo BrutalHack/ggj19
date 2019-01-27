@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using BrutalHack.ggj19.General.Music;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -33,13 +31,12 @@ namespace BrutalHack.ggj19.General
         private static readonly int ActivateVertical = Animator.StringToHash("activateVertical");
         private static readonly int ActivateHorizontal = Animator.StringToHash("activateHorizontal");
         private static readonly int Jump = Animator.StringToHash("jump");
-        private NodeCollectionLogic nodeCollectionLogic;
-
-        public GameObject polygonColliderPrefab;
 
         public AudioClip[] joySounds;
         private AudioSource audioSource;
 
+        private NodeCollectionLogic nodeCollectionLogic;
+        
         float oldHorizontal1;
         float oldHorizontal2;
         float oldVertical1;
@@ -198,22 +195,8 @@ namespace BrutalHack.ggj19.General
                 horizontalMovementEnabled = false;
                 verticalMovementEnabled = false;
 
-                List<Node> path = nodeCollectionLogic.TrackAndHandleMove(oldPosition, playerPosition);
-                if (path != null && path.Count > 0)
-                {
-                    FillCycle(path);
-                }
+                nodeCollectionLogic.TrackMove(oldPosition, playerPosition);
             }
-        }
-
-        public void FillCycle(List<Node> cycleNodes)
-        {
-            var colliderObject = Instantiate(polygonColliderPrefab);
-            PolygonCollider2D polygonCollider2D = colliderObject.GetComponent<PolygonCollider2D>();
-            Vector3[] cycleCoordinates =
-                cycleNodes.Select(node => GameGraphGenerator.nodesToGameObjects[node].transform.position).ToArray();
-            polygonCollider2D.points = cycleCoordinates.Select(vector3 => new Vector2(vector3.x, vector3.y)).ToArray();
-            colliderObject.GetComponent<MarkGraphElements>().outerNodeCycle = cycleNodes;
         }
 
         private void UpdateInput()
