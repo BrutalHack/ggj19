@@ -3,12 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
-using MusicXml;
-using MusicXml.Domain;
+using BrutalHack.ggj19.Music;
 using UnityEngine;
 using Time = UnityEngine.Time;
 
-namespace BrutalHack.ggj19.Music
+namespace BrutalHack.ggj19.General.Music
 {
     public class MusicController : MonoBehaviour
     {
@@ -117,40 +116,6 @@ namespace BrutalHack.ggj19.Music
             }
         }
 
-        private void ProcessPart(Part musicTrack)
-        {
-            Debug.Log("Processing Music Track: " + musicTrack.Name);
-            // QuarterNoteDivisions is only present at change or in first measurement 
-            int quarterNoteDivisions = 0;
-            double noteTimestamp = 0f;
-
-            foreach (Measure measure in musicTrack.Measures)
-            {
-                Debug.Log("Measure");
-                //The number of divisions, in which a quarter note is split up
-                if (measure.Attributes != null && measure.Attributes.Divisions != 0)
-                {
-                    quarterNoteDivisions = measure.Attributes.Divisions;
-                }
-
-                // the duration of a quarter note in seconds
-                double quarterNoteDurationInSeconds = 60d / tempo;
-
-                foreach (MeasureElement measureElement in measure.MeasureElements)
-                {
-                    if (measureElement.Element is Note note)
-                    {
-//                        Debug.Log("Note");
-                        NoteType noteType = ProcessNoteType(note);
-                        double noteDurationInSeconds = GetNoteDurationInSeconds(note.Duration, quarterNoteDivisions,
-                            quarterNoteDurationInSeconds);
-
-                        notes.Enqueue(new TimedNote {type = noteType, timestamp = noteTimestamp});
-                        noteTimestamp += noteDurationInSeconds;
-                    }
-                }
-            }
-        }
 
         private static double GetNoteDurationInSeconds(int noteDurationInDivisions, int quarterNoteDivisions,
             double quarterNoteDurationInSeconds)
@@ -165,25 +130,6 @@ namespace BrutalHack.ggj19.Music
         {
             double quarterNotePercent = (double) noteTimeStampInDivisions / quarterNoteDivisions;
             return quarterNotePercent * quarterNoteDurationInSeconds;
-        }
-
-        private static NoteType ProcessNoteType(Note note)
-        {
-            NoteType type = NoteType.Rest;
-            if (note.Pitch != null)
-            {
-                switch (note.Pitch.Step)
-                {
-                    case 'C':
-                        type = NoteType.Bass;
-                        break;
-                    case 'D':
-                        type = NoteType.Snare;
-                        break;
-                }
-            }
-
-            return type;
         }
 
         private static NoteType ProcessMidiNoteType(int midiSignal)
